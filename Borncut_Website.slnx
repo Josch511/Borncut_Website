@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="Borncut_Website/Borncut_Website.csproj" />
+  <Project Path="Class/Class.csproj" />
+  <Project Path="ServerAPI/ServerAPI.csproj" />
+  <Project Path="WebApp/WebApp.csproj" />
 </Solution>
