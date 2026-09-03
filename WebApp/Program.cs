@@ -1,27 +1,29 @@
-using WebApp.Components;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using WebApp;
+using WebApp.Service;
+using WebApp.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+builder.Services.AddBlazoredLocalStorage();
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICaseService, CaseService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICreateCaseService, CreateCaseService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+var apiBaseUrl = builder.HostEnvironment.IsDevelopment()
+    ? "https://localhost:7023/"
+    : "https://gruppe3-api.azurewebsites.net/";
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+builder.Services.AddScoped(sp => new HttpClient
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+    BaseAddress = new Uri(apiBaseUrl)
+});
 
-app.UseAntiforgery();
-
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();
+await builder.Build().RunAsync();
